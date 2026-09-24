@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+.env.local
+
+# generated data layer (rebuilt by `npm run seed` / first start); data/raw/ is kept so seeding works offline
+data/moil.db
+data/moil.db-*
+data/models/
+
+# Python / ML
+__pycache__/
+*.pyc
+ml/data/cache/

@@ -1,0 +1,480 @@
+{
+ "aois": [
+  {
+   "id": "bharveli",
+   "name": "Balaghat (Bharveli)",
+   "lat": 21.848,
+   "lng": 80.232,
+   "kind": "manganese"
+  },
+  {
+   "id": "ukwa",
+   "name": "Ukwa",
+   "lat": 21.966,
+   "lng": 80.452,
+   "kind": "manganese"
+  },
+  {
+   "id": "tirodi",
+   "name": "Tirodi",
+   "lat": 21.678,
+   "lng": 79.722,
+   "kind": "manganese"
+  },
+  {
+   "id": "chikla",
+   "name": "Chikla",
+   "lat": 21.543,
+   "lng": 79.748,
+   "kind": "manganese"
+  },
+  {
+   "id": "sitasaongi",
+   "name": "Sitasaongi",
+   "lat": 21.545,
+   "lng": 79.684,
+   "kind": "manganese"
+  },
+  {
+   "id": "dongri",
+   "name": "Dongri Buzurg",
+   "lat": 21.632,
+   "lng": 79.838,
+   "kind": "manganese"
+  },
+  {
+   "id": "kandri_munsar",
+   "name": "Kandri-Munsar",
+   "lat": 21.41,
+   "lng": 79.275,
+   "kind": "manganese"
+  },
+  {
+   "id": "gumgaon",
+   "name": "Gumgaon",
+   "lat": 21.4,
+   "lng": 78.972,
+   "kind": "manganese"
+  },
+  {
+   "id": "gondegaon_coal",
+   "name": "Gondegaon (coal, negative control)",
+   "lat": 21.27,
+   "lng": 79.17,
+   "kind": "coal"
+  },
+  {
+   "id": "saoner_coal",
+   "name": "Adasa-Saoner (coal, negative control)",
+   "lat": 21.352,
+   "lng": 78.945,
+   "kind": "coal"
+  }
+ ],
+ "windows": [
+  [
+   "2026-01-15",
+   "2026-03-15"
+  ],
+  [
+   "2026-04-01",
+   "2026-06-20"
+  ],
+  [
+   "2025-10-20",
+   "2025-12-31"
+  ]
+ ],
+ "scenes": [
+  {
+   "aoi": "bharveli",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260313T050649_R019_T44QMK_20260313T091002",
+    "datetime": "2026-03-13T05:06:49.024000Z",
+    "cloud": 0.000322
+   },
+   "landsat": {
+    "id": "LC08_L2SP_143045_20260309_02_T1",
+    "datetime": "2026-03-09T05:02:10.072868Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "bharveli",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20260616T050651_R019_T44QMK_20260616T100816",
+    "datetime": "2026-06-16T05:06:51.025000Z",
+    "cloud": 0.876128
+   },
+   "landsat": {
+    "id": "LC09_L2SP_143045_20260605_02_T1",
+    "datetime": "2026-06-05T05:01:32.029132Z",
+    "cloud": 1.12
+   }
+  },
+  {
+   "aoi": "bharveli",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20251228T051231_R019_T44QMK_20251228T090010",
+    "datetime": "2025-12-28T05:12:31.025000Z",
+    "cloud": 0.042993
+   },
+   "landsat": {
+    "id": "LC09_L2SP_143045_20251227_02_T1",
+    "datetime": "2025-12-27T05:02:43.475996Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "ukwa",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260313T050649_R019_T44QMK_20260313T091002",
+    "datetime": "2026-03-13T05:06:49.024000Z",
+    "cloud": 0.000322
+   },
+   "landsat": {
+    "id": "LC08_L2SP_143045_20260309_02_T1",
+    "datetime": "2026-03-09T05:02:10.072868Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "ukwa",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20260616T050651_R019_T44QMK_20260616T100816",
+    "datetime": "2026-06-16T05:06:51.025000Z",
+    "cloud": 0.876128
+   },
+   "landsat": {
+    "id": "LC09_L2SP_143045_20260605_02_T1",
+    "datetime": "2026-06-05T05:01:32.029132Z",
+    "cloud": 1.12
+   }
+  },
+  {
+   "aoi": "ukwa",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20251228T051231_R019_T44QMK_20251228T090010",
+    "datetime": "2025-12-28T05:12:31.025000Z",
+    "cloud": 0.042993
+   },
+   "landsat": {
+    "id": "LC09_L2SP_143045_20251227_02_T1",
+    "datetime": "2025-12-27T05:02:43.475996Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "tirodi",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260313T050649_R019_T44QLK_20260313T091002",
+    "datetime": "2026-03-13T05:06:49.024000Z",
+    "cloud": 0.000677
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20260308_02_T1",
+    "datetime": "2026-03-08T05:08:34.237368Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "tirodi",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20260616T050651_R019_T44QLK_20260616T100816",
+    "datetime": "2026-06-16T05:06:51.025000Z",
+    "cloud": 5.583027
+   },
+   "landsat": {
+    "id": "LC08_L2SP_144045_20260620_02_T1",
+    "datetime": "2026-06-20T05:07:43.803169Z",
+    "cloud": 0.55
+   }
+  },
+  {
+   "aoi": "tirodi",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20251228T051231_R019_T44QLK_20251228T090010",
+    "datetime": "2025-12-28T05:12:31.025000Z",
+    "cloud": 0.148052
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20251218_02_T1",
+    "datetime": "2025-12-18T05:08:52.167187Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "chikla",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260313T050649_R019_T44QLJ_20260313T091002",
+    "datetime": "2026-03-13T05:06:49.024000Z",
+    "cloud": 1.3e-05
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20260308_02_T1",
+    "datetime": "2026-03-08T05:08:34.237368Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "chikla",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260611T050649_R019_T44QLJ_20260611T085745",
+    "datetime": "2026-06-11T05:06:49.024000Z",
+    "cloud": 14.711203
+   },
+   "landsat": {
+    "id": "LC08_L2SP_144045_20260620_02_T1",
+    "datetime": "2026-06-20T05:07:43.803169Z",
+    "cloud": 0.55
+   }
+  },
+  {
+   "aoi": "chikla",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20251228T051231_R019_T44QLJ_20251228T090010",
+    "datetime": "2025-12-28T05:12:31.025000Z",
+    "cloud": 0.000299
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20251218_02_T1",
+    "datetime": "2025-12-18T05:08:52.167187Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "sitasaongi",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260313T050649_R019_T44QLJ_20260313T091002",
+    "datetime": "2026-03-13T05:06:49.024000Z",
+    "cloud": 1.3e-05
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20260308_02_T1",
+    "datetime": "2026-03-08T05:08:34.237368Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "sitasaongi",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260611T050649_R019_T44QLJ_20260611T085745",
+    "datetime": "2026-06-11T05:06:49.024000Z",
+    "cloud": 14.711203
+   },
+   "landsat": {
+    "id": "LC08_L2SP_144045_20260620_02_T1",
+    "datetime": "2026-06-20T05:07:43.803169Z",
+    "cloud": 0.55
+   }
+  },
+  {
+   "aoi": "sitasaongi",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20251228T051231_R019_T44QLJ_20251228T090010",
+    "datetime": "2025-12-28T05:12:31.025000Z",
+    "cloud": 0.000299
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20251218_02_T1",
+    "datetime": "2025-12-18T05:08:52.167187Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "dongri",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260313T050649_R019_T44QLK_20260313T091002",
+    "datetime": "2026-03-13T05:06:49.024000Z",
+    "cloud": 0.000677
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20260308_02_T1",
+    "datetime": "2026-03-08T05:08:34.237368Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "dongri",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20260616T050651_R019_T44QLK_20260616T100816",
+    "datetime": "2026-06-16T05:06:51.025000Z",
+    "cloud": 5.583027
+   },
+   "landsat": {
+    "id": "LC08_L2SP_144045_20260620_02_T1",
+    "datetime": "2026-06-20T05:07:43.803169Z",
+    "cloud": 0.55
+   }
+  },
+  {
+   "aoi": "dongri",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20251228T051231_R019_T44QLK_20251228T090010",
+    "datetime": "2025-12-28T05:12:31.025000Z",
+    "cloud": 0.148052
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20251218_02_T1",
+    "datetime": "2025-12-18T05:08:52.167187Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "kandri_munsar",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260313T050649_R019_T44QLJ_20260313T091002",
+    "datetime": "2026-03-13T05:06:49.024000Z",
+    "cloud": 1.3e-05
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20260308_02_T1",
+    "datetime": "2026-03-08T05:08:34.237368Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "kandri_munsar",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260611T050649_R019_T44QLJ_20260611T085745",
+    "datetime": "2026-06-11T05:06:49.024000Z",
+    "cloud": 14.711203
+   },
+   "landsat": {
+    "id": "LC08_L2SP_144045_20260620_02_T1",
+    "datetime": "2026-06-20T05:07:43.803169Z",
+    "cloud": 0.55
+   }
+  },
+  {
+   "aoi": "kandri_munsar",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20251228T051231_R019_T44QLJ_20251228T090010",
+    "datetime": "2025-12-28T05:12:31.025000Z",
+    "cloud": 0.000299
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20251218_02_T1",
+    "datetime": "2025-12-18T05:08:52.167187Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "gumgaon",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260313T050649_R019_T44QKJ_20260313T091002",
+    "datetime": "2026-03-13T05:06:49.024000Z",
+    "cloud": 0.001288
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20260308_02_T1",
+    "datetime": "2026-03-08T05:08:34.237368Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "gumgaon",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20260619T051651_R062_T44QKJ_20260619T101809",
+    "datetime": "2026-06-19T05:16:51.025000Z",
+    "cloud": 0.999142
+   },
+   "landsat": {
+    "id": "LC08_L2SP_144045_20260620_02_T1",
+    "datetime": "2026-06-20T05:07:43.803169Z",
+    "cloud": 0.55
+   }
+  },
+  {
+   "aoi": "gumgaon",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20251231T052231_R062_T44QKJ_20251231T085810",
+    "datetime": "2025-12-31T05:22:31.025000Z",
+    "cloud": 0.00086
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20251218_02_T1",
+    "datetime": "2025-12-18T05:08:52.167187Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "gondegaon_coal",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260313T050649_R019_T44QLJ_20260313T091002",
+    "datetime": "2026-03-13T05:06:49.024000Z",
+    "cloud": 1.3e-05
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20260308_02_T1",
+    "datetime": "2026-03-08T05:08:34.237368Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "gondegaon_coal",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260611T050649_R019_T44QLJ_20260611T085745",
+    "datetime": "2026-06-11T05:06:49.024000Z",
+    "cloud": 14.711203
+   },
+   "landsat": {
+    "id": "LC08_L2SP_144045_20260620_02_T1",
+    "datetime": "2026-06-20T05:07:43.803169Z",
+    "cloud": 0.55
+   }
+  },
+  {
+   "aoi": "gondegaon_coal",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20251228T051231_R019_T44QLJ_20251228T090010",
+    "datetime": "2025-12-28T05:12:31.025000Z",
+    "cloud": 0.000299
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20251218_02_T1",
+    "datetime": "2025-12-18T05:08:52.167187Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "saoner_coal",
+   "sentinel2": {
+    "id": "S2B_MSIL2A_20260313T050649_R019_T44QKJ_20260313T091002",
+    "datetime": "2026-03-13T05:06:49.024000Z",
+    "cloud": 0.001288
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20260308_02_T1",
+    "datetime": "2026-03-08T05:08:34.237368Z",
+    "cloud": 0.0
+   }
+  },
+  {
+   "aoi": "saoner_coal",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20260619T051651_R062_T44QKJ_20260619T101809",
+    "datetime": "2026-06-19T05:16:51.025000Z",
+    "cloud": 0.999142
+   },
+   "landsat": {
+    "id": "LC08_L2SP_144045_20260620_02_T1",
+    "datetime": "2026-06-20T05:07:43.803169Z",
+    "cloud": 0.55
+   }
+  },
+  {
+   "aoi": "saoner_coal",
+   "sentinel2": {
+    "id": "S2C_MSIL2A_20251231T052231_R062_T44QKJ_20251231T085810",
+    "datetime": "2025-12-31T05:22:31.025000Z",
+    "cloud": 0.00086
+   },
+   "landsat": {
+    "id": "LC09_L2SP_144045_20251218_02_T1",
+    "datetime": "2025-12-18T05:08:52.167187Z",
+    "cloud": 0.0
+   }
+  }
+ ]
+}

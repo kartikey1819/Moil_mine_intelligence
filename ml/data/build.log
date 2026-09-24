@@ -1,0 +1,42 @@
+bharveli        workings=2 zones>=50% inside=4
+   S2 2026-03-13 (0.0% cloud) · LST 2026-03-09
+   S2 2026-06-16 (0.9% cloud) · LST 2026-06-05
+   S2 2025-12-28 (0.0% cloud) · LST 2025-12-27
+ukwa            workings=3 zones>=50% inside=6
+   S2 2026-03-13 (0.0% cloud) · LST 2026-03-09
+   S2 2026-06-16 (0.9% cloud) · LST 2026-06-05
+   S2 2025-12-28 (0.0% cloud) · LST 2025-12-27
+tirodi          workings=3 zones>=50% inside=18
+   S2 2026-03-13 (0.0% cloud) · LST 2026-03-08
+   S2 2026-06-16 (5.6% cloud) · LST 2026-06-20
+   S2 2025-12-28 (0.1% cloud) · LST 2025-12-18
+chikla          workings=2 zones>=50% inside=4
+   S2 2026-03-13 (0.0% cloud) · LST 2026-03-08
+   S2 2026-06-11 (14.7% cloud) · LST 2026-06-20
+   S2 2025-12-28 (0.0% cloud) · LST 2025-12-18
+sitasaongi      workings=1 zones>=50% inside=8
+   S2 2026-03-13 (0.0% cloud) · LST 2026-03-08
+   S2 2026-06-11 (14.7% cloud) · LST 2026-06-20
+   S2 2025-12-28 (0.0% cloud) · LST 2025-12-18
+dongri          workings=2 zones>=50% inside=2
+   S2 2026-03-13 (0.0% cloud) · LST 2026-03-08
+   S2 2026-06-16 (5.6% cloud) · LST 2026-06-20
+   S2 2025-12-28 (0.1% cloud) · LST 2025-12-18
+kandri_munsar   workings=3 zones>=50% inside=4
+   S2 2026-03-13 (0.0% cloud) · LST 2026-03-08
+   S2 2026-06-11 (14.7% cloud) · LST 2026-06-20
+   S2 2025-12-28 (0.0% cloud) · LST 2025-12-18
+gumgaon         workings=1 zones>=50% inside=2
+   S2 2026-03-13 (0.0% cloud) · LST 2026-03-08
+   S2 2026-06-19 (1.0% cloud) · LST 2026-06-20
+   S2 2025-12-31 (0.0% cloud) · LST 2025-12-18
+gondegaon_coal  workings=5 zones>=50% inside=28
+   S2 2026-03-13 (0.0% cloud) · LST 2026-03-08
+   S2 2026-06-11 (14.7% cloud) · LST 2026-06-20
+   S2 2025-12-28 (0.0% cloud) · LST 2025-12-18
+saoner_coal     workings=4 zones>=50% inside=7
+   S2 2026-03-13 (0.0% cloud) · LST 2026-03-08
+   S2 2026-06-19 (1.0% cloud) · LST 2026-06-20
+   S2 2025-12-31 (0.0% cloud) · LST 2025-12-18
+
+7680 rows · positives 144 · ambiguous 240 · negatives 7296 (of which coal-pit zones 105)

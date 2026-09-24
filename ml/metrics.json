@@ -1,0 +1,241 @@
+{
+ "name": "MOIL-L1 manganese prospectivity classifier",
+ "version": "2.0.0",
+ "type": "XGBoost gradient-boosted trees, exact TreeSHAP explanations, in-browser inference",
+ "trained_at": "2026-09-19T08:05:28+00:00",
+ "features": [
+  {
+   "name": "ferric_ratio",
+   "source": "ferric_ratio",
+   "transform": "aoi_anomaly",
+   "label": "Ferric-iron / Mn-oxide ratio (S2 B04/B02)"
+  },
+  {
+   "name": "clay_ratio",
+   "source": "clay_ratio",
+   "transform": "aoi_anomaly",
+   "label": "Clay / alteration ratio (S2 B11/B12)"
+  },
+  {
+   "name": "albedo",
+   "source": "albedo",
+   "transform": "aoi_anomaly",
+   "label": "Visible albedo (dark Mn-oxide ground)"
+  },
+  {
+   "name": "ndvi",
+   "source": "ndvi",
+   "transform": "aoi_anomaly",
+   "label": "Vegetation index (NDVI)"
+  },
+  {
+   "name": "ndwi",
+   "source": "ndwi",
+   "transform": "aoi_anomaly",
+   "label": "Water / moisture index (NDWI)"
+  },
+  {
+   "name": "lst_c",
+   "source": "lst_c",
+   "transform": "aoi_anomaly",
+   "label": "Land-surface temperature"
+  },
+  {
+   "name": "tpi_m",
+   "source": "tpi_m",
+   "transform": "raw",
+   "label": "Topographic position (ridge + / valley -)"
+  },
+  {
+   "name": "slope_deg",
+   "source": "slope_deg",
+   "transform": "raw",
+   "label": "Terrain slope"
+  }
+ ],
+ "weights": {
+  "ferric_ratio": 0.1443,
+  "clay_ratio": 0.0354,
+  "albedo": 0.0723,
+  "ndvi": 0.0386,
+  "ndwi": 0.08,
+  "lst_c": 0.0437,
+  "tpi_m": 0.2522,
+  "slope_deg": 0.3333
+ },
+ "class_thresholds": {
+  "high": 56.9,
+  "moderate": 8.7,
+  "high_precision": 0.336,
+  "high_recall": 0.285,
+  "moderate_precision": 0.111,
+  "moderate_recall": 0.597
+ },
+ "confidence_bands": {
+  "medium": 1.7,
+  "low": 7.4
+ },
+ "training": {
+  "label": "zone >= 50 % inside a mapped working (OpenStreetMap) of a documented MOIL manganese mine",
+  "negatives": "all other zones, plus two coal-mine AOIs as hard negatives",
+  "sources": "Sentinel-2 L2A + Landsat 8/9 (Microsoft Planetary Computer), Copernicus DEM (Open-Meteo) - same as the live provider",
+  "zones": 7440,
+  "positives": 144,
+  "mine_areas": [
+   "bharveli",
+   "chikla",
+   "dongri",
+   "gondegaon_coal",
+   "gumgaon",
+   "kandri_munsar",
+   "saoner_coal",
+   "sitasaongi",
+   "tirodi",
+   "ukwa"
+  ],
+  "scenes": 12,
+  "scene_dates": [
+   "2025-12-28",
+   "2025-12-31",
+   "2026-03-13",
+   "2026-06-11",
+   "2026-06-16",
+   "2026-06-19"
+  ]
+ },
+ "validation": {
+  "scheme": "leave-one-mine-out (spatial hold-out of entire mine areas, all seasons)",
+  "models": {
+   "expert_index (no training)": {
+    "roc_auc": 0.4234,
+    "pr_auc": 0.0183,
+    "top5pct_capture": 0.0873
+   },
+   "logistic_regression": {
+    "roc_auc": 0.8319,
+    "pr_auc": 0.1361,
+    "top5pct_capture": 0.4444,
+    "brier": 0.1191
+   },
+   "random_forest": {
+    "roc_auc": 0.8897,
+    "pr_auc": 0.2545,
+    "top5pct_capture": 0.5397,
+    "brier": 0.0178
+   },
+   "xgboost": {
+    "roc_auc": 0.875,
+    "pr_auc": 0.259,
+    "top5pct_capture": 0.5397,
+    "brier": 0.0225
+   }
+  },
+  "per_mine": [
+   {
+    "mine": "bharveli",
+    "zones": 735,
+    "positives": 12,
+    "roc_auc": 0.792,
+    "pr_auc": 0.076
+   },
+   {
+    "mine": "chikla",
+    "zones": 741,
+    "positives": 12,
+    "roc_auc": 0.799,
+    "pr_auc": 0.331
+   },
+   {
+    "mine": "dongri",
+    "zones": 750,
+    "positives": 6,
+    "roc_auc": 0.967,
+    "pr_auc": 0.118
+   },
+   {
+    "mine": "gondegaon_coal",
+    "zones": 768,
+    "positives": 0,
+    "coal_pit_zones": 84,
+    "coal_pit_mean_probability": 0.241
+   },
+   {
+    "mine": "gumgaon",
+    "zones": 756,
+    "positives": 6,
+    "roc_auc": 0.731,
+    "pr_auc": 0.048
+   },
+   {
+    "mine": "kandri_munsar",
+    "zones": 741,
+    "positives": 12,
+    "roc_auc": 0.901,
+    "pr_auc": 0.085
+   },
+   {
+    "mine": "saoner_coal",
+    "zones": 768,
+    "positives": 0,
+    "coal_pit_zones": 21,
+    "coal_pit_mean_probability": 0.159
+   },
+   {
+    "mine": "sitasaongi",
+    "zones": 738,
+    "positives": 24,
+    "roc_auc": 0.994,
+    "pr_auc": 0.892
+   },
+   {
+    "mine": "tirodi",
+    "zones": 726,
+    "positives": 54,
+    "roc_auc": 0.93,
+    "pr_auc": 0.631
+   },
+   {
+    "mine": "ukwa",
+    "zones": 717,
+    "positives": 18,
+    "roc_auc": 0.818,
+    "pr_auc": 0.089
+   }
+  ],
+  "ablation": [
+   {
+    "features": "all features",
+    "roc_auc": 0.875,
+    "pr_auc": 0.259,
+    "top5pct_capture": 0.5397,
+    "brier": 0.0225,
+    "mean_p_manganese_pits": 0.335,
+    "mean_p_coal_pits": 0.224
+   },
+   {
+    "features": "without slope",
+    "roc_auc": 0.8102,
+    "pr_auc": 0.2393,
+    "top5pct_capture": 0.5159,
+    "brier": 0.0258,
+    "mean_p_manganese_pits": 0.324,
+    "mean_p_coal_pits": 0.361
+   },
+   {
+    "features": "spectral + thermal only (no terrain)",
+    "roc_auc": 0.7077,
+    "pr_auc": 0.0574,
+    "top5pct_capture": 0.3016,
+    "brier": 0.0328,
+    "mean_p_manganese_pits": 0.194,
+    "mean_p_coal_pits": 0.445
+   }
+  ]
+ },
+ "limitations": [
+  "Labels are surface workings, not drill intercepts: the model learns the surface signature of KNOWN manganese ground and ranks look-alike ground. It cannot see blind ore bodies under cover.",
+  "Ablation: most of the skill comes from terrain (ridge position, slope). Spectral indices alone cannot tell manganese pits from coal pits. Ridges are geologically meaningful here (resistant gondite / Mn bands form strike ridges) but part of the signal is the shape of the pit itself.",
+  "Only 8 manganese mine areas: metrics have wide error bars. Retrain with MOIL borehole / assay data (ml/README.md).",
+  "Trained on the Sausar belt (Madhya Pradesh / Maharashtra). Scores elsewhere are extrapolation."
+ ]
+}

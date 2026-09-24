@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOIL Mine Intelligence — Model Validation Lab</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8fafc;
+    --panel: #ffffff;
+    --card: #ffffff;
+    --card-subtle: #f8fafc;
+    --line: #e2e8f0;
+    --line-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-body: #334155;
+    --muted: #64748b;
+    --faint: #94a3b8;
+    --mn-deep: #2e0836;
+    --mn-primary: #4a154b;
+    --mn-accent: #6b21a8;
+    --mn-tint: #faf5ff;
+    --mn-tint-border: #e9d5ff;
+    --mn-rust: #b45309;
+    --hi: #b91c1c;
+    --mo: #c2410c;
+    --lo: #2563eb;
+    --ok: #15803d;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 13px/1.5 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 24px;
+    height: 62px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+  .logo-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--mn-deep), var(--mn-primary));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(74, 21, 75, 0.25);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .logo-badge .symbol { font-size: 15px; font-weight: 800; }
+  .logo-badge .atomic { font-size: 8px; font-weight: 600; opacity: 0.85; font-family: 'JetBrains Mono', monospace; }
+  header h1 { font-size: 15px; margin: 0; font-weight: 700; color: var(--text); }
+  header small { color: var(--muted); font-size: 11px; display: block; }
+  header a.nav-back {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--mn-primary);
+    text-decoration: none;
+    padding: 6px 12px;
+    background: var(--mn-tint);
+    border: 1px solid var(--mn-tint-border);
+    border-radius: 6px;
+    transition: all 0.15s ease;
+  }
+  header a.nav-back:hover { background: #ede9fe; color: var(--mn-deep); }
+
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 24px 20px 60px; }
+  h2 { font-size: 18px; font-weight: 800; margin: 28px 0 6px; letter-spacing: -0.02em; }
+  h2:first-child { margin-top: 0; }
+  h3 { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 12px; }
+  .muted { color: var(--muted); }
+
+  .kpis { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 18px; }
+  .kpi {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 16px;
+    min-width: 140px;
+    box-shadow: var(--shadow-sm);
+  }
+  .kpi b { display: block; font-size: 22px; font-weight: 800; color: var(--mn-primary); font-family: 'JetBrains Mono', monospace; }
+  .kpi span { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; }
+
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  .card {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+    min-width: 0;
+    box-shadow: var(--shadow-sm);
+  }
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 10.5px; }
+  tr.best td { color: var(--ok); font-weight: 700; background: #f0fdf450; }
+
+  .bar { display: grid; grid-template-columns: 140px 1fr 48px; gap: 8px; align-items: center; margin: 6px 0; font-size: 11.5px; }
+  .bar i { display: block; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--mn-primary), var(--mn-accent)); }
+  .bar b { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+
+  ul { margin: 8px 0 0; padding-left: 18px; color: var(--text-body); }
+  li { margin-bottom: 6px; font-size: 12px; }
+
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 14px 0; }
+  select, button {
+    font: inherit;
+    font-size: 12px;
+    background: #ffffff;
+    color: var(--text);
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    padding: 8px 12px;
+  }
+  button {
+    background: var(--mn-primary);
+    border-color: var(--mn-primary);
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.15s ease;
+  }
+  button:hover:not(:disabled) { background: var(--mn-deep); border-color: var(--mn-deep); }
+  button.ghost { background: #ffffff; border-color: var(--line); color: var(--text-body); }
+  button.ghost:hover:not(:disabled) { background: var(--card-subtle); color: var(--text); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .lab { display: grid; grid-template-columns: 1fr 420px; gap: 16px; margin-top: 14px; }
+  @media (max-width: 960px) { .lab { grid-template-columns: 1fr; } }
+  #map { height: 580px; border-radius: 10px; border: 1px solid var(--line-strong); background: #e2e8f0; box-shadow: var(--shadow-sm); }
+  #detail { max-height: 580px; overflow-y: auto; }
+
+  .score { font-size: 38px; font-weight: 800; line-height: 1; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em; }
+  .High { color: var(--hi); } .Moderate { color: var(--mo); } .Low { color: var(--lo); }
+  
+  .shap { display: grid; grid-template-columns: 1fr 120px 48px; gap: 6px; align-items: center; font-size: 11.5px; margin: 5px 0; }
+  .shap .t { position: relative; height: 8px; background: #e2e8f0; border-radius: 4px; }
+  .shap .t::after { content: ''; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1.5px; background: var(--muted); }
+  .shap .t i { position: absolute; top: 0; height: 8px; border-radius: 4px; }
+  .shap .up { background: var(--hi); left: 50%; }
+  .shap .dn { background: var(--lo); right: 50%; }
+  .shap b { text-align: right; font-family: 'JetBrains Mono', monospace; }
+
+  .wi { margin: 8px 0; font-size: 11.5px; }
+  .wi div { display: flex; justify-content: space-between; }
+  .wi b { font-family: 'JetBrains Mono', monospace; color: var(--mn-primary); }
+  input[type=range] { width: 100%; accent-color: var(--mn-primary); }
+
+  .action {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-left: 4px solid var(--mn-rust);
+    padding: 8px 12px;
+    border-radius: 0 6px 6px 0;
+    margin: 10px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #78350f;
+  }
+  .status { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .status .ok { color: var(--ok); font-weight: 600; }
+  .status .fail { color: var(--hi); font-weight: 600; }
+
+  .tg {
+    display: grid;
+    grid-template-columns: 28px 1fr 50px 60px;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    border: 1px solid var(--line);
+    margin-bottom: 4px;
+    background: var(--card-subtle);
+    transition: all 0.12s ease;
+  }
+  .tg:hover { background: #ffffff; border-color: var(--mn-primary); box-shadow: var(--shadow-sm); }
+  .tg span { font-weight: 600; }
+  .tg b { font-family: 'JetBrains Mono', monospace; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-badge" title="Manganese (Mn)">
+    <span class="symbol">Mn</span>
+    <span class="atomic">25</span>
+  </div>
+  <div>
+    <h1>MOIL Mine Intelligence — Model Validation Lab</h1>
+    <small>XGBoost &amp; Exact TreeSHAP Explainability · Zero-Server Pure Browser Inference</small>
+  </div>
+  <a href="index.html" class="nav-back">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M12 7H5.4l3.3-3.3L7.3 2.3 1.6 8l5.7 5.7 1.4-1.4L5.4 9H12V7z"/></svg>
+    <span>Back to Operations Dashboard</span>
+  </a>
+</header>
+
+<div class="wrap">
+  <h2>Model Specification &amp; Held-Out Validation</h2>
+  <div id="sub" class="muted"></div>
+  <div class="kpis" id="kpis"></div>
+  
+  <div class="grid">
+    <div class="card">
+      <h3>Held-Out Accuracy: Trained Models vs. Hand-Weighted Index</h3>
+      <div class="scroll" id="cmp"></div>
+      <p class="muted" id="cmpNote" style="font-size:11.5px;margin-top:10px;line-height:1.4"></p>
+    </div>
+    <div class="card">
+      <h3>Feature Importance (Mean |TreeSHAP|)</h3>
+      <div id="imp"></div>
+    </div>
+    <div class="card">
+      <h3>Generalization: Each Mine Evaluated by Model That Never Saw It</h3>
+      <div class="scroll" id="mines"></div>
+    </div>
+    <div class="card">
+      <h3>Ablation Study: Skill Contribution by Feature Group</h3>
+      <div class="scroll" id="abl"></div>
+      <p class="muted" style="font-size:11.5px;margin-top:10px">Same hold-out setup. "p coal pits" must stay low: those are excavated surfaces but not manganese bearing.</p>
+    </div>
+    <div class="card">
+      <h3>Training Dataset &amp; Geological Boundary Limitations</h3>
+      <div id="train"></div>
+    </div>
+  </div>
+
+  <h2>Live Test with Real Satellite Data</h2>
+  <div class="muted">Acquires today's Sentinel-2 / Landsat / DEM scenes for the target area, scores every 300 m zone with the trained model, and decomposes the decision into TreeSHAP feature attributions.</div>
+  
+  <div class="controls">
+    <select id="aoi"></select>
+    <button id="run">Run ML Prospectivity Inference</button>
+    <select id="layer" disabled>
+      <option value="ml">Overlay: ML Prospectivity Score</option>
+      <option value="unc">Overlay: Model Uncertainty (±)</option>
+      <option value="diff">Overlay: ML Delta vs Expert Index</option>
+    </select>
+    <label style="font-size:12px;display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+      <input type="checkbox" id="fresh" checked style="accent-color:var(--mn-primary)">
+      <span>Rank only virgin ground outside existing workings</span>
+    </label>
+    <button class="ghost" id="csv" disabled>Export Ranked Targets (CSV)</button>
+  </div>
+  <div class="status" id="status"></div>
+  <div class="lab">
+    <div id="map"></div>
+    <div class="card" id="detail">
+      <p class="muted">Run an analysis above, then click a target zone to review its TreeSHAP attribution and simulate what-if ground conditions.</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/live-provider.js"></script>
+<script src="js/model.js"></script>
+<script src="js/trained-model.js"></script>
+<script src="js/ml-runtime.js"></script>
+<script src="js/model-trained.js"></script>
+<script>
+(function () {
+  const M = window.TrainedModel, ML = window.TrainedProspectivityModel, expert = window.ProspectivityModel, provider = window.DataProvider;
+  const $ = (id) => document.getElementById(id), esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const fmt = (v) => (v == null ? '—' : v);
+
+  // ---- model card ---------------------------------------------------------------------------
+  const V = M.validation, X = V.models.xgboost, E = V.models['expert_index (no training)'];
+  $('sub').textContent = `${M.name} v${M.version} · trained ${M.trained_at.slice(0, 10)} · ${V.scheme}`;
+  $('kpis').innerHTML = [[X.roc_auc, 'ROC-AUC (held-out mines)'], [X.pr_auc, 'PR-AUC'], [`${Math.round(X.top5pct_capture * 100)}%`, 'known Mn zones in top-5 % ranks'],
+    [M.training.zones.toLocaleString(), 'training zones (real data)'], [M.training.positives, 'manganese-working zones'], [M.training.mine_areas.length, 'mine areas · ' + M.training.scenes + ' scenes']]
+    .map(([b, s]) => `<div class="kpi"><b>${b}</b><span>${s}</span></div>`).join('');
+  const best = Object.entries(V.models).sort((a, b) => b[1].pr_auc - a[1].pr_auc)[0][0];
+  $('cmp').innerHTML = `<table><tr><th>Model</th><th>ROC-AUC</th><th>PR-AUC</th><th>Top-5 % capture</th><th>Brier</th></tr>${Object.entries(V.models).map(([k, m]) =>
+    `<tr class="${k === best ? 'best' : ''}"><td>${k.replace(/_/g, ' ')}</td><td>${m.roc_auc}</td><td>${m.pr_auc}</td><td>${Math.round(m.top5pct_capture * 100)}%</td><td>${fmt(m.brier)}</td></tr>`).join('')}</table>`;
+  $('cmpNote').textContent = `PR-AUC is the honest metric here (only ${(M.training.positives / M.training.zones * 100).toFixed(1)} % of zones are positive; a random ranking scores ≈ ${(M.training.positives / M.training.zones).toFixed(3)}). A simple hand-weighted spectral index (no training, no terrain): ${E.pr_auc} → XGBoost: ${X.pr_auc}.`;
+  const wmax = Math.max(...Object.values(M.weights));
+  $('imp').innerHTML = M.features.slice().sort((a, b) => M.weights[b.name] - M.weights[a.name]).map((f) => `<div class="bar"><span title="${esc(f.label)}">${f.name}</span><i style="width:${(M.weights[f.name] / wmax) * 100}%"></i><b>${Math.round(M.weights[f.name] * 100)}%</b></div>`).join('');
+  $('mines').innerHTML = `<table><tr><th>Held-out area</th><th>Zones</th><th>Mn zones</th><th>ROC-AUC</th><th>PR-AUC</th><th>Coal-pit false alarm</th></tr>${V.per_mine.map((r) =>
+    `<tr><td>${r.mine}</td><td>${r.zones}</td><td>${r.positives}</td><td>${fmt(r.roc_auc)}</td><td>${fmt(r.pr_auc)}</td><td>${r.coal_pit_mean_probability != null ? `${Math.round(r.coal_pit_mean_probability * 100)}/100 over ${r.coal_pit_zones} pit zones` : '—'}</td></tr>`).join('')}</table>`;
+  $('abl').innerHTML = `<table><tr><th>Features</th><th>ROC-AUC</th><th>PR-AUC</th><th>p Mn pits</th><th>p coal pits</th></tr>${V.ablation.map((a) => `<tr><td>${a.features}</td><td>${a.roc_auc}</td><td>${a.pr_auc}</td><td>${a.mean_p_manganese_pits}</td><td>${a.mean_p_coal_pits}</td></tr>`).join('')}</table>`;
+  $('train').innerHTML = `<p><b>Label:</b> ${esc(M.training.label)}.<br><b>Negatives:</b> ${esc(M.training.negatives)}.<br><b>Sources:</b> ${esc(M.training.sources)}.<br>
+    <b>Classes:</b> High ≥ ${M.class_thresholds.high} (held-out precision ${Math.round(M.class_thresholds.high_precision * 100)} %, recall ${Math.round(M.class_thresholds.high_recall * 100)} %) · Moderate ≥ ${M.class_thresholds.moderate}.</p><ul>${M.limitations.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>`;
+
+  // ---- live test ----------------------------------------------------------------------------
+  $('aoi').innerHTML = provider.bookmarks.map((b) => `<option value="${b.id}">${esc(b.name)}</option>`).join('');
+  const map = L.map('map').setView([21.6, 79.7], 9);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Imagery © Esri, Maxar', maxZoom: 19 }).addTo(map);
+  const ramp = (stops) => (t) => { t = Math.min(1, Math.max(0, t)) * (stops.length - 1); const i = Math.min(stops.length - 2, Math.floor(t)), k = t - i; return `rgb(${stops[i].map((v, j) => Math.round(v + (stops[i + 1][j] - v) * k)).join(',')})`; };
+  const LAYERS = {
+    ml: { get: (p) => p.result.prospectivity_score, min: 0, max: 100, ramp: ramp([[49, 54, 149], [116, 173, 209], [255, 255, 191], [244, 109, 67], [185, 28, 28]]) },
+    unc: { get: (p) => p.result.uncertainty, min: 0, max: 25, ramp: ramp([[248, 250, 252], [168, 85, 247], [59, 7, 100]]) },
+    diff: { get: (p) => p.result.prospectivity_score - p.expert_score, min: -60, max: 60, ramp: ramp([[37, 99, 235], [241, 245, 249], [185, 28, 28]]) },
+  };
+  const state = { features: null, layer: null, selected: null };
+  const isNew = (p) => !$('fresh').checked || p.dist_workings_km == null || p.dist_workings_km > 0.3;
+  const ranked = () => state.features.map((f) => f.properties).filter((p) => !p.result.masked && isNew(p)).sort((a, b) => b.result.prospectivity_score - a.result.prospectivity_score);
+
+  function draw() {
+    const l = LAYERS[$('layer').value];
+    if (state.layer) map.removeLayer(state.layer);
+    state.layer = L.geoJSON({ type: 'FeatureCollection', features: state.features }, {
+      style: (f) => ({ color: f.properties.zone_id === state.selected ? '#4a154b' : '#334155', weight: f.properties.zone_id === state.selected ? 3 : 0.4, fillColor: l.ramp((l.get(f.properties) - l.min) / (l.max - l.min)), fillOpacity: 0.65 }),
+      onEachFeature: (f, lyr) => { lyr.bindTooltip(`${f.properties.zone_id} · ML ${f.properties.result.prospectivity_score} ±${f.properties.result.uncertainty} · expert ${f.properties.expert_score}`, { sticky: true }); lyr.on('click', () => select(f.properties.zone_id)); },
+    }).addTo(map);
+  }
+
+  function select(id) { state.selected = id; draw(); detail(); }
+  function detail() {
+    const p = state.features.find((f) => f.properties.zone_id === state.selected).properties, r = p.result;
+    const ev = r.evidence.filter((e) => e.factor !== 'base_rate').sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution));
+    const max = Math.max(1, ...ev.map((e) => Math.abs(e.contribution)));
+    const rank = ranked().findIndex((q) => q.zone_id === p.zone_id);
+    $('detail').innerHTML = `<h3>${p.zone_id}</h3><div class="score ${r.prospectivity_class}">${r.prospectivity_score}<small style="font-size:13px;color:var(--muted)"> /100 · ${r.prospectivity_class} · ±${fmt(r.uncertainty)} · ${r.confidence} confidence</small></div>
+      <div class="muted" style="font-size:11.5px;margin:4px 0 8px">${rank >= 0 ? `Target rank #${rank + 1}` : 'Not ranked (existing working or masked)'} · Expert formula: ${p.expert_score}/100 · ${fmt(p.dist_workings_km)} km from mapped workings</div>
+      <div class="action">Operational Directive: ${esc(r.recommended_action)}</div>
+      <p style="font-size:12px;line-height:1.5;color:var(--text-body)">${esc(r.explanation)}</p>
+      ${ev.length ? `<h3 style="margin-top:16px">TreeSHAP Feature Attributions <small style="text-transform:none">(Delta from base rate ${r.base_score})</small></h3>${ev.map((e) => `<div class="shap"><span title="${esc(e.label)}">${e.factor} <small>${fmt(e.value)}</small></span>
+        <div class="t"><i class="${e.contribution >= 0 ? 'up' : 'dn'}" style="width:${(Math.abs(e.contribution) / max) * 50}%"></i></div><b class="${e.contribution >= 0 ? 'High' : 'Low'}">${e.contribution > 0 ? '+' : ''}${e.contribution}</b></div>`).join('')}
+      <h3 style="margin-top:18px">What-If Ground Simulation <small style="text-transform:none">— drag to re-predict live</small></h3><div id="wi"></div><div class="action" id="wiOut"></div>` : ''}`;
+    if (!ev.length) return;
+    const over = {};
+    const spans = { ferric_ratio: [0.5, 3.5, 0.01], clay_ratio: [0.8, 2.2, 0.01], albedo: [0.02, 0.4, 0.005], ndvi: [-0.1, 0.9, 0.01], ndwi: [-0.8, 0.2, 0.01], lst_c: [15, 60, 0.5], tpi_m: [-40, 40, 0.5], slope_deg: [0, 25, 0.5] };
+    $('wi').innerHTML = M.features.filter((f) => p[f.source] != null).map((f) => { const [a, b, s] = spans[f.name]; return `<div class="wi"><div><span>${esc(f.label)}</span><b id="v_${f.name}">${p[f.source]}</b></div><input type="range" min="${a}" max="${b}" step="${s}" value="${p[f.source]}" data-f="${f.source}" data-n="${f.name}"></div>`; }).join('');
+    const out = () => { const s = ML.whatIf(state.features, p.zone_id, over); $('wiOut').innerHTML = Object.keys(over).length ? `Simulated Score: <b>${s.toFixed(1)}</b> (${ML.classify(s)}) — Measured: ${r.prospectivity_score}, Change: ${s - r.prospectivity_score >= 0 ? '+' : ''}${(s - r.prospectivity_score).toFixed(1)}` : 'Adjust any slider above to simulate ground or spectral changes.'; };
+    $('wi').querySelectorAll('input').forEach((i) => i.addEventListener('input', () => { over[i.dataset.f] = +i.value; $('v_' + i.dataset.n).textContent = i.value; out(); }));
+    out();
+  }
+
+  function targets() {
+    const top = ranked().slice(0, 8);
+    $('detail').innerHTML = `<h3>Ranked Targets${$('fresh').checked ? ' (Outside Existing Workings)' : ''}</h3>${top.map((p, i) => `<div class="tg" data-z="${p.zone_id}"><span>#${i + 1}</span><span>${p.zone_id}</span><b class="${p.result.prospectivity_class}">${p.result.prospectivity_score}</b><small>±${p.result.uncertainty}</small></div>`).join('')}<p class="muted" style="font-size:11.5px;margin-top:8px">Click any target row above or click a polygon directly on the map.</p>`;
+    $('detail').querySelectorAll('.tg').forEach((t) => t.addEventListener('click', () => select(t.dataset.z)));
+  }
+
+  $('run').addEventListener('click', async () => {
+    const aoi = provider.bookmarks.find((b) => b.id === $('aoi').value), steps = {};
+    $('run').disabled = true; $('status').textContent = 'Acquiring satellite and DEM rasters…';
+    try {
+      const a = await provider.analyse(aoi, (key, st, label, d) => { steps[key] = `<span class="${st}">${st === 'ok' ? '✔' : st === 'fail' ? '✘' : '…'} ${esc(label)}${d ? ' · ' + esc(d) : ''}</span>`; $('status').innerHTML = Object.values(steps).join(' &nbsp; '); });
+      state.features = a.zones.features; state.selected = null;
+      expert.scoreAll(state.features);
+      state.features.forEach((f) => { f.properties.expert_score = f.properties.result.prospectivity_score; });
+      ML.scoreAll(state.features);
+      draw(); map.fitBounds(state.layer.getBounds()); targets();
+      $('layer').disabled = $('csv').disabled = false;
+    } catch (e) { $('status').innerHTML = `<span class="fail">Analysis failed: ${esc(e.message || e)}</span>`; }
+    $('run').disabled = false;
+  });
+  $('layer').addEventListener('change', draw);
+  $('fresh').addEventListener('change', () => state.features && targets());
+  $('csv').addEventListener('click', () => {
+    const rows = [['rank', 'zone_id', 'lng', 'lat', 'ml_score', 'class', 'uncertainty', 'confidence', 'expert_score', 'dist_workings_km', 'top_driver', 'recommended_action']]
+      .concat(ranked().map((p, i) => { const d = p.result.evidence.filter((e) => e.factor !== 'base_rate').sort((x, y) => y.contribution - x.contribution)[0]; return [i + 1, p.zone_id, ...p.centroid, p.result.prospectivity_score, p.result.prospectivity_class, p.result.uncertainty, p.result.confidence, p.expert_score, p.dist_workings_km, d ? d.factor : '', `"${p.result.recommended_action}"`]; }));
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([rows.map((r) => r.join(',')).join('\n')], { type: 'text/csv' })); a.download = `${$('aoi').value}_ml_targets.csv`; a.click();
+  });
+})();
+</script>
+</body>
+</html>
