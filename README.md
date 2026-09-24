@@ -22,7 +22,7 @@ npm install
 npm run dev        # API on http://localhost:8710 + dashboard on http://localhost:5173
 ```
 
-The first start builds `data/moil.db`: it loads the cached ERA5 and DEM downloads from `data/raw` (or fetches them), simulates the operating history and trains the model. This takes about 30 s. The server then keeps the data current by itself: it appends each missing day, refreshes live weather every 3 h, and warms forecasts and action plans in the background.
+The first start builds `data/moil.db`: it loads the cached ERA5 and DEM downloads from `data/raw` (or fetches them), simulates the operating history and trains the model. This takes about 30 s. The server then keeps the data current by itself: it appends each missing day, refreshes live weather every hour, and warms forecasts and action plans in the background.
 
 ```bash
 npm run build && npm start      # production: one server on http://localhost:8710 serving API + dashboard
