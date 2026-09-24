@@ -7,7 +7,7 @@
  *   6. train + register the production-attainment model
  * Run: npm run seed   (raw downloads are cached in data/raw, so re-seeding works offline) */
 import fs from 'node:fs';
-import { openDb, insertMany, setMeta, DB_PATH, all } from '../lib/db.mjs';
+import { openDb, closeDb, insertMany, setMeta, DB_PATH, all } from '../lib/db.mjs';
 import { MINES } from '../config/mines.mjs';
 import { addDays, todayIST } from '../lib/dates.mjs';
 import { loadHistory, fillRecent, weatherMap } from '../services/weather.mjs';
@@ -22,6 +22,7 @@ const WARMUP_START = '2023-01-01';
 
 export async function seed({ log = console.log } = {}) {
   const t0 = Date.now();
+  closeDb();                                   // release the file before replacing it
   for (const f of [DB_PATH, `${DB_PATH}-wal`, `${DB_PATH}-shm`]) if (fs.existsSync(f)) fs.rmSync(f);
   openDb();
 

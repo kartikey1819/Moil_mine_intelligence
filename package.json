@@ -5,11 +5,14 @@
   "description": "MOIL Mine Intelligence — AI/ML + space-technology platform for manganese reserve mapping, production-shortfall prediction and corrective-action planning (SIH 2026 PS 26009)",
   "type": "commonjs",
   "scripts": {
+    "predev": "node scripts/check-env.mjs",
     "dev": "concurrently -k -n api,web -c magenta,cyan \"npm:dev:api\" \"npm:dev:web\"",
     "dev:api": "node --no-warnings --watch-path=server server/index.mjs",
     "dev:web": "vite",
+    "preseed": "node scripts/check-env.mjs",
     "seed": "node --no-warnings server/seed/index.mjs",
     "build": "vite build",
+    "prestart": "node scripts/check-env.mjs",
     "start": "node --no-warnings server/index.mjs",
     "preview": "vite preview",
     "verify:model": "node ml/verify_runtime.js",
@@ -27,6 +30,6 @@
     "three": "^0.186.0"
   },
   "engines": {
-    "node": ">=22.5"
+    "node": ">=22.13"
   }
 }

@@ -60,6 +60,11 @@ export function openDb() {
   return db;
 }
 
+/** Close the connection (the seed must do this before replacing the database file — Windows locks open files). */
+export function closeDb() {
+  if (db) { try { db.close(); } catch { /* already closed */ } db = null; }
+}
+
 export const all = (sql, ...p) => openDb().prepare(sql).all(...p);
 export const get = (sql, ...p) => openDb().prepare(sql).get(...p);
 export const run = (sql, ...p) => openDb().prepare(sql).run(...p);
