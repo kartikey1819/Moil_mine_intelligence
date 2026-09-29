@@ -1,5 +1,5 @@
 /* Data & Models — architecture, data lineage & live source health, model cards, validation, MOIL data import + retrain. */
-import { api, clearApiCache } from '../lib/api.js';
+import { api, clearApiCache, SNAPSHOT, SNAPSHOT_MSG } from '../lib/api.js';
 import { chart } from '../lib/charts.js';
 import { card, loading, errorBox, badge, src, $, download, toast } from '../lib/ui.js';
 import { t, esc, num, date, ago, dateLong } from '../lib/format.js';
@@ -122,6 +122,10 @@ export async function mount(root, ctx) {
   };
   loadModels().catch((e) => { $('#dProdCard', root).innerHTML = errorBox(e); });
 
+  if (SNAPSHOT) {
+    for (const id of ['#dRetrain', '#dUpload']) { const b = $(id, root); b.disabled = true; b.title = SNAPSHOT_MSG; }
+    $('#dImportOut', root).innerHTML = `<div class="note">${SNAPSHOT_MSG}</div>`;
+  }
   $('#dRetrain', root).addEventListener('click', async () => {
     const b = $('#dRetrain', root); b.disabled = true; b.textContent = 'Training…';
     try {

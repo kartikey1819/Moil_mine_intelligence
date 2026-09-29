@@ -13,7 +13,7 @@ An end-to-end platform for MOIL's eight Sausar-belt manganese mines. It covers t
 
 ## Run
 
-Requires **Node.js ≥ 22.5** (uses the built-in `node:sqlite`) and an internet connection for the live satellite and weather feeds. No database server, no API keys.
+Requires **Node.js ≥ 22.13** (uses the built-in `node:sqlite`) and an internet connection for the live satellite and weather feeds. No database server, no API keys.
 
 ```bash
 git clone https://github.com/kartikey1819/Moil_mine_intelligence.git
@@ -29,6 +29,15 @@ npm run build && npm start      # production: one server on http://localhost:871
 npm run seed                    # rebuild the database from scratch
 npm run verify:model            # prospectivity model: browser runtime == XGBoost (probabilities + SHAP)
 ```
+
+## Deploy (Vercel, static snapshot)
+
+`npm run build:snapshot` builds the dashboard in snapshot mode. It then starts the API once, waits for the live ingest and cache warm-up, and saves every response the dashboard reads to `dist/snapshot/` (about 850 JSON files, 13 MB). The result is a static site with no server and no cold starts. `vercel.json` already sets this up, so to deploy:
+
+1. vercel.com → **Add New → Project** → import this repository. Leave all settings at their defaults; the build takes about 3 min.
+2. For a daily refresh (new weather, forecasts, alerts and plans), go to **Project → Settings → Git → Deploy Hooks** and create a hook for `main`. Add its URL as the GitHub secret `VERCEL_DEPLOY_HOOK_URL`. The workflow in `.github/workflows/refresh-snapshot.yml` then redeploys every day at 06:00 IST.
+
+The snapshot includes every page and every mine: forecasts, SHAP drivers, risk, alerts, action plans, reserves, the 3D block model and drill logs. Satellite Prospecting still calls the public satellite APIs live from the browser. The parts that need a running server are disabled and labelled: the what-if simulator, re-simulation, retraining and CSV import. Run those with `npm run dev`.
 
 ## Architecture
 

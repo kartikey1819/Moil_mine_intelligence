@@ -12,6 +12,7 @@
     "preseed": "node scripts/check-env.mjs",
     "seed": "node --no-warnings server/seed/index.mjs",
     "build": "vite build",
+    "build:snapshot": "vite build --mode snapshot && node --no-warnings scripts/export-snapshot.mjs",
     "prestart": "node scripts/check-env.mjs",
     "start": "node --no-warnings server/index.mjs",
     "preview": "vite preview",

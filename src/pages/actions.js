@@ -1,6 +1,6 @@
 /* Action Planner — optimised corrective actions (schedule, blasting, equipment redeployment, maintenance,
  * dewatering), each valued by the Monte-Carlo × ML forecast; live re-simulation and a what-if simulator. */
-import { api, post } from '../lib/api.js';
+import { api, post, SNAPSHOT, SNAPSHOT_MSG } from '../lib/api.js';
 import { chart } from '../lib/charts.js';
 import { card, kpi, loading, errorBox, badge, src, $, $$, download, toast } from '../lib/ui.js';
 import { t, pct, esc, date, inr, signedT, num, pp } from '../lib/format.js';
@@ -93,7 +93,7 @@ export async function mount(root, ctx) {
     $$('#aList .action-card', root).forEach((c) => c.querySelector('.pick').addEventListener('change', (e) => {
       e.target.checked ? selected.add(c.dataset.id) : selected.delete(c.dataset.id);
       c.classList.toggle('selected', e.target.checked);
-      $('#aResim', root).disabled = false;
+      $('#aResim', root).disabled = SNAPSHOT;
     }));
   };
   drawList();
@@ -178,5 +178,9 @@ export async function mount(root, ctx) {
     $('#simRun', root).disabled = false;
   };
   $('#simRun', root).onclick = runSim;
-  runSim();
+  if (SNAPSHOT) {
+    $('#simRun', root).disabled = true;
+    $('#aResim', root).title = SNAPSHOT_MSG;
+    $('#simChart', root).innerHTML = `<div class="note brand" style="margin-top:10px"><b>Snapshot version.</b> ${SNAPSHOT_MSG} The optimised plan, its forecast and every action's value on this page are the real simulation results, computed when this snapshot was built.</div>`;
+  } else runSim();
 }

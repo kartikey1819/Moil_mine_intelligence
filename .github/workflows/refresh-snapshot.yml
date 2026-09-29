@@ -1,0 +1,21 @@
+# Rebuilds the static Vercel snapshot every day, so the live weather forecast, alerts,
+# production forecasts and action plans stay current.
+# Setup (once): Vercel → Project → Settings → Git → Deploy Hooks → create a hook for "main",
+# then add its URL as the GitHub repository secret VERCEL_DEPLOY_HOOK_URL.
+name: Refresh Vercel snapshot
+
+on:
+  schedule:
+    - cron: '30 0 * * *'   # 06:00 IST daily
+  workflow_dispatch: {}
+
+jobs:
+  redeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel deploy hook
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "VERCEL_DEPLOY_HOOK_URL secret not set — skipping"; exit 0; fi
+          curl -fsS -X POST "$HOOK"

@@ -1,7 +1,7 @@
 /* MOIL Mine Intelligence — app bootstrap: shell, hash router, global mine context, theme. */
 import 'leaflet/dist/leaflet.css';
 import './styles/app.css';
-import { api } from './lib/api.js';
+import { api, SNAPSHOT } from './lib/api.js';
 import { state, set, subscribe } from './lib/store.js';
 import { disposeCharts, rerenderCharts } from './lib/charts.js';
 import { errorBox, loading, $, $$ } from './lib/ui.js';
@@ -79,6 +79,13 @@ async function boot() {
     $('#mineSelect').innerHTML = meta.mines.map((m) => `<option value="${m.id}">${m.name} · ${m.method === 'OC' ? 'Open cast' : 'Underground'}</option>`).join('');
     $('#mineSelect').value = state.mine;
     $('#fyLabel').textContent = meta.fy.label;
+    if (SNAPSHOT) {
+      const pill = document.createElement('div');
+      pill.className = 'live-pill';
+      pill.title = 'Static snapshot of the platform, rebuilt daily. Satellite Prospecting runs live; what-if simulation, retraining and data import need the full server version.';
+      pill.innerHTML = `<span class="dot warn"></span>Snapshot · <b>${dateLong(meta.as_of)}</b>`;
+      $('#fyLabel').parentElement.before(pill);
+    }
     $('#asOf').textContent = dateLong(meta.as_of);
     $('#apiDot').className = 'dot ok'; $('#apiState').textContent = 'online';
   } catch (e) {
