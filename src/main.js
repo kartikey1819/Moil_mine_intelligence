@@ -115,6 +115,30 @@ async function pollStatus() {
   }
 }
 
+/** Count KPI headline numbers up from zero when they appear (keeps the rendered format: decimals, grouping, suffix). */
+function countUp(el) {
+  const node = [...el.childNodes].find((n) => n.nodeType === 3 && /\d/.test(n.nodeValue));
+  if (!node || el.dataset.counted) return;
+  const m = /^(\D*?)(-?[\d,]*\.?\d+)(.*)$/s.exec(node.nodeValue.trim());
+  if (!m) return;
+  const [, pre, numStr, post] = m, target = +numStr.replace(/,/g, '');
+  if (!isFinite(target) || target === 0) return;
+  el.dataset.counted = '1';
+  const dec = (numStr.split('.')[1] || '').length, grouped = numStr.includes(',');
+  const fmt = (v) => (grouped ? v.toLocaleString('en-IN', { minimumFractionDigits: dec, maximumFractionDigits: dec }) : v.toFixed(dec));
+  const t0 = performance.now(), dur = 1000;
+  const step = (now) => {
+    const k = Math.min(1, (now - t0) / dur), e = 1 - (1 - k) ** 3;
+    node.nodeValue = `${pre}${fmt(target * e)}${post}`;
+    if (k < 1) requestAnimationFrame(step); else node.nodeValue = `${pre}${numStr}${post}`;
+  };
+  requestAnimationFrame(step);
+}
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  new MutationObserver(() => $$('#content .kpi .val:not([data-counted]), #content .pipe-stat .v:not([data-counted])').forEach(countUp))
+    .observe($('#content'), { childList: true, subtree: true });
+}
+
 /** Navigate to a mine-specific page from anywhere (e.g. a table row). */
 window.goMine = (id, route = 'production') => { set({ mine: id }); location.hash = `#/${route}`; };
 

@@ -61,7 +61,7 @@ export async function mount(root, ctx) {
       grid: { left: 8, right: 10, top: 10, bottom: 50, containLabel: true },
       xAxis: { type: 'category', data: weeks.map((d) => date(d)), splitArea: { show: false }, axisLabel: { fontSize: 10 } },
       yAxis: { type: 'category', data: mines.map((m) => m.name.replace(' Mine', '')), axisLabel: { fontSize: 11 } },
-      visualMap: { min: 0, max: 1, calculable: false, orient: 'horizontal', left: 'center', bottom: 0, itemHeight: 180, itemWidth: 10, text: ['100%', '0%'], textStyle: { color: p.muted, fontSize: 10 }, inRange: { color: ['#eefbf2', '#fde68a', '#f59e0b', '#dc2626', '#7f1d1d'] } },
+      visualMap: { min: 0, max: 1, calculable: false, orient: 'horizontal', left: 'center', bottom: 0, itemHeight: 180, itemWidth: 10, text: ['100%', '0%'], textStyle: { color: p.muted, fontSize: 10 }, inRange: { color: [p.surface3, '#facc15', '#fb923c', '#ef4444', '#be123c'] } },
       series: [{ type: 'heatmap', progressive: 0, data: heat, label: { show: true, fontSize: 9.5, formatter: (d) => (d.value[2] >= 0.1 ? Math.round(d.value[2] * 100) : ''), color: '#111' }, itemStyle: { borderColor: p.surface, borderWidth: 2, borderRadius: 3 } }],
     }));
 

@@ -6,14 +6,29 @@ import { card, kpi, loading, errorBox, badge, src, $ } from '../lib/ui.js';
 import { t, pct, esc, date, weekday, inr, signedT, ago } from '../lib/format.js';
 import { state } from '../lib/store.js';
 
+const ICONS = {
+  globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-7"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+};
+/** One stage of the Identify → Predict → Act pipeline banner; the headline number is filled in once data loads. */
+const step = (href, eyebrow, title, sub, statId, statLabel, icon) => `<a class="pipe-step" href="${href}"><div class="pipe-num">${icon}</div>
+  <div class="pipe-body"><div class="eyebrow">${eyebrow}</div><b>${title}</b><span>${sub}</span></div>
+  <div class="pipe-stat"><div class="v" id="${statId}">—</div><div class="l">${statLabel}</div></div></a>`;
+
 export async function mount(root, ctx) {
   root.innerHTML = `
     <div class="ph"><div><h2>Portfolio Command Center</h2>
       <p>Eight MOIL manganese mines in the Sausar belt (MP &amp; Maharashtra): reserves, production against plan, the probabilistic shortfall outlook and what to do about it — refreshed from live weather and the operating record.</p></div>
       <div class="actions" id="ovSrc"></div></div>
+    <div class="pipeline">
+      ${step('#/exploration', '01 · Identify reserves', 'Satellite + drilling → UNFC reserves', 'Sentinel-2 · Landsat · DEM · kriging', 'pipeReserves', 'reserves', ICONS.globe)}
+      ${step('#/production', '02 · Predict shortfalls', 'Monte-Carlo × ML forecast', 'equipment · weather · blasting drivers', 'pipeRisk', 'shortfall risk · 4 wk', ICONS.chart)}
+      ${step('#/actions', '03 · Corrective action', 'Optimised, costed action plan', 'schedule · blasting · fleet · dewatering', 'pipeAct', 'recoverable · 13 wk', ICONS.check)}
+    </div>
     <div class="grid g-6" id="ovKpis">${Array(6).fill('<div class="card skeleton" style="height:112px"></div>').join('')}</div>
     <div class="grid g-3-2">
-      ${card({ title: 'Mine locations & shortfall risk', sub: 'next 4 weeks', right: '<span class="legend-row"><span><i style="background:var(--crit)"></i>High</span><span><i style="background:var(--med)"></i>Medium</span><span><i style="background:var(--low)"></i>Low</span></span>', body: '<div id="ovMap" class="map" style="height:390px"></div>', bodyCls: 'flush' })}
+      ${card({ title: 'Mine locations & shortfall risk', sub: 'next 4 weeks', right: '<span class="legend-row"><span><i style="background:var(--crit)"></i>High</span><span><i style="background:var(--med)"></i>Medium</span><span><i style="background:var(--low)"></i>Low</span></span>', body: '<div id="ovMap" class="map" style="height:414px"></div>', bodyCls: 'flush' })}
       ${card({ title: 'Portfolio production', sub: 'weekly · actual vs plan · 13-week forecast', right: src('ml', 'Monte-Carlo × ML'), body: '<div id="ovChart" class="chart lg"></div>' })}
     </div>
     ${card({ title: 'Mine performance & outlook', sub: 'click a row to drill down', right: `${src('sim', 'Ops: simulated')} ${src('real', 'Weather: ERA5 + live')}`, body: `<div class="tbl-wrap" id="ovTable">${loading('Running forecasts…', 'Monte-Carlo simulation of every mine')}</div>`, bodyCls: 'flush' })}
@@ -30,6 +45,9 @@ export async function mount(root, ctx) {
     const P = ov.portfolio, K = ov.kpis;
     $('#ovSrc', root).innerHTML = `${src(ov.weather_live ? 'live' : 'real', ov.weather_live ? `Weather live · ${ago(ov.weather_fetched_at)}` : 'Weather: climatology')} <span class="badge neutral">Data as of ${date(ov.as_of, { day: 'numeric', month: 'short', year: 'numeric' })}</span>`;
 
+    $('#pipeReserves', root).innerHTML = `${t(K.reserves_t, { unit: false, d: 1 })}<small class="muted" style="font-size:12px"> Mt</small>`;
+    $('#pipeRisk', root).innerHTML = `<span style="color:${P.next4.p_shortfall_5pct >= 0.7 ? 'var(--crit)' : P.next4.p_shortfall_5pct >= 0.4 ? 'var(--high)' : 'var(--low)'}">${pct(P.next4.p_shortfall_5pct)}</span>`;
+
     // ---- KPIs
     const gap4 = P.next4.p50 - P.next4.plan;
     $('#ovKpis', root).innerHTML = [
@@ -45,9 +63,9 @@ export async function mount(root, ctx) {
     map = L.map($('#ovMap', root), { zoomControl: true, attributionControl: true, scrollWheelZoom: false }).setView([21.65, 79.75], 9);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Imagery © Esri, Maxar', maxZoom: 18 }).addTo(map);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', { attribution: '© OSM © CARTO', maxZoom: 18, opacity: 0.9 }).addTo(map);
-    const color = (r) => ({ High: '#d92d20', Medium: '#e0a000', Low: '#16a34a' }[r]);
+    const color = (r) => ({ High: '#ff4d5e', Medium: '#fbbf24', Low: '#34d399' }[r]);
     ov.mines.forEach((m) => {
-      const mk = L.circleMarker([m.lat, m.lng], { radius: 7 + Math.sqrt(m.annual_plan_t / 1e4) * 1.6, color: '#fff', weight: 2, fillColor: color(m.risk), fillOpacity: 0.92 }).addTo(map);
+      const mk = L.circleMarker([m.lat, m.lng], { radius: 7 + Math.sqrt(m.annual_plan_t / 1e4) * 1.6, color: '#fff', weight: 2, fillColor: color(m.risk), fillOpacity: 0.92, className: `pin-${m.risk}` }).addTo(map);
       mk.bindTooltip(`<b>${esc(m.name)}</b> · ${m.method === 'OC' ? 'Open cast' : 'Underground'}<br>Next 4 wk P50 <b>${t(m.next4.p50)}</b> / plan ${t(m.next4.plan)}<br>Shortfall risk (&gt;5%) <b>${pct(m.next4.p_shortfall_5pct)}</b><br>Reserves ${t(m.reserves?.reserves_t)} · life ${m.reserves?.life_years ?? '—'} yr`, { className: 'tt', direction: 'top', offset: [0, -8] });
       mk.on('click', () => window.goMine(m.id, 'production'));
       L.marker([m.lat, m.lng], { icon: L.divIcon({ className: '', html: `<div style="transform:translate(14px,-8px);color:#fff;font-weight:700;font-size:11px;text-shadow:0 1px 3px #000;white-space:nowrap">${esc(m.name.replace(' Mine', ''))}</div>` }), interactive: false }).addTo(map);
@@ -94,6 +112,8 @@ export async function mount(root, ctx) {
     const top = sorted.slice(0, 2);
     Promise.all(top.map((m) => api(`/mines/${m.id}/actions`, { ttl: 10 * 60e3 }).catch(() => null))).then((plans) => {
       if (!ctx.isCurrent()) return;
+      const gain = plans.filter(Boolean).reduce((s, pl) => s + pl.actions.filter((a) => a.selected).reduce((x, a) => x + (a.net_t_13w || 0), 0), 0);
+      $('#pipeAct', root).innerHTML = gain > 0 ? `<span style="color:var(--low)">${signedT(gain)}</span>` : '—';
       const items = plans.filter(Boolean).flatMap((pl) => pl.actions.filter((a) => a.selected).slice(0, 3).map((a) => ({ ...a, mine: pl.mine, mine_id: pl.mine_id })));
       $('#ovActions', root).innerHTML = items.length ? `<div class="stack">${items.map((a) => `<div class="row between" style="align-items:flex-start;gap:12px;padding-bottom:9px;border-bottom:1px solid var(--border)">
         <div><div class="small muted">${esc(a.mine)} · ${esc(a.category)}</div><b style="font-size:12.5px">${esc(a.title)}</b></div>

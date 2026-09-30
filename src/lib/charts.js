@@ -9,7 +9,8 @@ export function palette() {
     text: css('--text'), text2: css('--text-2'), muted: css('--muted'), faint: css('--faint'), border: css('--border'), surface: css('--surface'), surface3: css('--surface-3'),
     brand: css('--brand'), brand2: css('--brand-2'), rose: css('--rose'), actual: css('--c-actual'), plan: css('--c-plan'), forecast: css('--c-forecast'), band: css('--c-band'),
     crit: css('--crit'), high: css('--high'), med: css('--med'), low: css('--low'), info: css('--info'),
-    series: [css('--brand'), '#2f7ed8', '#e0913a', '#2a9d8f', css('--rose'), '#6c7a89', '#8e6cc0', '#c4a000'],
+    series: [css('--brand'), '#38bdf8', '#fb923c', '#2dd4bf', css('--rose'), '#94a3b8', '#a78bfa', '#facc15'],
+    dark: document.documentElement.dataset.theme === 'dark',
   };
 }
 
@@ -17,8 +18,10 @@ function baseOption(p) {
   return {
     color: p.series,
     textStyle: { fontFamily: 'Inter, system-ui, sans-serif', color: p.text2 },
+    animationDuration: 900, animationEasing: 'cubicOut', animationDurationUpdate: 500,
     grid: { left: 12, right: 16, top: 34, bottom: 8, containLabel: true },
-    tooltip: { trigger: 'axis', backgroundColor: p.surface, borderColor: p.border, textStyle: { color: p.text, fontSize: 12 }, extraCssText: 'box-shadow:0 8px 24px rgba(0,0,0,.18);border-radius:8px;' },
+    tooltip: { trigger: 'axis', backgroundColor: p.dark ? 'rgba(13,18,34,.88)' : 'rgba(255,255,255,.92)', borderColor: p.border, textStyle: { color: p.text, fontSize: 12 }, extraCssText: 'box-shadow:0 12px 32px rgba(0,0,0,.28);border-radius:10px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);',
+      axisPointer: { lineStyle: { color: p.brand, opacity: 0.5 }, shadowStyle: { color: p.dark ? 'rgba(167,139,250,.08)' : 'rgba(124,58,237,.06)' } } },
     legend: { top: 0, right: 0, icon: 'roundRect', itemWidth: 12, itemHeight: 8, textStyle: { color: p.muted, fontSize: 11 } },
   };
 }
@@ -46,6 +49,15 @@ export function chart(el, build) {
   return inst;
 }
 
+/** Vertical gradient of one colour (opacity a0 at the top → a1 at the bottom) — for bars and areas. */
+export const vgrad = (c, a0 = 1, a1 = 0.3) => new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: alpha(c, a0) }, { offset: 1, color: alpha(c, a1) }]);
+function alpha(c, a) {
+  const m = /^#([0-9a-f]{6})$/i.exec(c);
+  if (!m) return c;
+  const n = parseInt(m[1], 16);
+  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`;
+}
+
 const fmtT = (v) => (v == null ? '—' : Math.abs(v) >= 1e4 ? `${(v / 1e3).toFixed(1)} kt` : `${Math.round(v).toLocaleString('en-IN')} t`);
 const fmtD = (iso) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
@@ -68,11 +80,11 @@ export function fanChart(el, { hist, weeks, title = '', extra = [] }) {
     xAxis: { type: 'category', data: x, axisLabel: { formatter: (v) => fmtD(v) }, boundaryGap: true },
     yAxis: { type: 'value', axisLabel: { formatter: (v) => (v >= 1e3 ? `${(v / 1e3).toFixed(v >= 1e4 ? 0 : 1)}k` : v) } },
     series: [
-      { name: 'Actual', type: 'bar', data: [...hist.map((s) => s.actual), ...fx.map(() => null)], itemStyle: { color: p.actual, borderRadius: [3, 3, 0, 0] }, barMaxWidth: 14 },
+      { name: 'Actual', type: 'bar', data: [...hist.map((s) => s.actual), ...fx.map(() => null)], itemStyle: { color: vgrad(p.actual, 1, 0.35), borderRadius: [4, 4, 0, 0] }, emphasis: { itemStyle: { color: p.brand } }, barMaxWidth: 14 },
       { name: 'Plan', type: 'line', step: 'middle', data: [...hist.map((s) => s.plan), ...weeks.map((w) => w.plan)], symbol: 'none', lineStyle: { color: p.plan, type: 'dashed', width: 1.5 }, z: 5 },
-      { name: 'band-lo', type: 'line', stack: 'band', data: [...hx.map(() => null), ...weeks.map((w) => w.p10)], symbol: 'none', lineStyle: { opacity: 0 }, silent: true },
-      { name: 'P10–P90 band', type: 'line', stack: 'band', data: [...hx.map(() => null), ...weeks.map((w) => w.p90 - w.p10)], symbol: 'none', lineStyle: { opacity: 0 }, areaStyle: { color: p.band }, itemStyle: { color: p.band }, silent: true },
-      { name: 'Forecast P50', type: 'line', data: [...hx.map(() => null), ...weeks.map((w) => w.p50)], symbol: 'circle', symbolSize: 5, lineStyle: { color: p.forecast, width: 2.5 }, itemStyle: { color: p.forecast }, z: 6,
+      { name: 'band-lo', type: 'line', stack: 'band', data: [...hx.map(() => null), ...weeks.map((w) => w.p10)], symbol: 'none', smooth: 0.3, lineStyle: { opacity: 0 }, silent: true },
+      { name: 'P10–P90 band', type: 'line', stack: 'band', data: [...hx.map(() => null), ...weeks.map((w) => w.p90 - w.p10)], symbol: 'none', smooth: 0.3, lineStyle: { opacity: 0 }, areaStyle: { color: p.band }, itemStyle: { color: p.band }, silent: true },
+      { name: 'Forecast P50', type: 'line', data: [...hx.map(() => null), ...weeks.map((w) => w.p50)], symbol: 'circle', symbolSize: 6, smooth: 0.3, lineStyle: { color: p.forecast, width: 3, shadowColor: p.forecast, shadowBlur: 12 }, itemStyle: { color: p.forecast, borderColor: p.surface, borderWidth: 1.5 }, z: 6,
         markLine: fx.length ? { silent: true, symbol: 'none', label: { formatter: 'forecast →', color: p.muted, fontSize: 10, position: 'insideEndTop' }, lineStyle: { color: p.faint }, data: [{ xAxis: fx[0] }] } : undefined },
       ...extra.map((e) => ({ name: e.name, type: 'line', data: e.data, symbol: 'none', lineStyle: { color: e.color || p.low, width: 2, type: e.dashed ? 'dashed' : 'solid' }, itemStyle: { color: e.color || p.low }, z: 7 })),
     ],
@@ -99,9 +111,9 @@ export function waterfall(el, { start, items, endLabel, startLabel, plan }) {
       yAxis: { type: 'value', min: Math.floor(lo / 100) * 100, axisLabel: { formatter: (v) => (v >= 1e3 ? `${(v / 1e3).toFixed(1)}k` : v) } },
       series: [
         { type: 'bar', stack: 'w', data: base, itemStyle: { color: 'transparent' }, silent: true },
-        { type: 'bar', stack: 'w', data: up.map((v, i) => (v == null ? null : { value: v, itemStyle: { color: i === 0 || i === names.length - 1 ? p.forecast : p.low, borderRadius: 3 } })), barMaxWidth: 34,
+        { type: 'bar', stack: 'w', data: up.map((v, i) => (v == null ? null : { value: v, itemStyle: { color: i === 0 || i === names.length - 1 ? vgrad(p.forecast, 1, 0.55) : vgrad(p.low, 1, 0.6), borderRadius: 4, shadowColor: i === 0 || i === names.length - 1 ? p.forecast : p.low, shadowBlur: 8 } })), barMaxWidth: 34,
           label: { show: true, position: 'top', fontSize: 10, color: p.muted, formatter: (d) => (d.dataIndex === 0 || d.dataIndex === names.length - 1 ? fmtT(d.value) : `+${fmtT(d.value)}`) } },
-        { type: 'bar', stack: 'w', data: down.map((v) => (v == null ? null : { value: v, itemStyle: { color: p.crit, borderRadius: 3 } })), barMaxWidth: 34,
+        { type: 'bar', stack: 'w', data: down.map((v) => (v == null ? null : { value: v, itemStyle: { color: vgrad(p.crit, 1, 0.6), borderRadius: 4, shadowColor: p.crit, shadowBlur: 8 } })), barMaxWidth: 34,
           label: { show: true, position: 'bottom', fontSize: 10, color: p.muted, formatter: (d) => `−${fmtT(d.value)}` },
           markLine: plan ? { silent: true, symbol: 'none', data: [{ yAxis: plan }], lineStyle: { color: p.plan, type: 'dashed' }, label: { formatter: `plan ${fmtT(plan)}`, color: p.muted, fontSize: 10, position: 'insideEndTop' } } : undefined },
       ],
