@@ -6,18 +6,21 @@
  * The Satellite Prospecting page stays fully live (it calls the public satellite APIs from the browser).
  *
  * Run: npm run build:snapshot     (= vite build --mode snapshot && this script)
+ *
+ * With --out data/precomputed (npm run build:render) the same responses become the precomputed set the hosted
+ * server answers from (server/lib/precomputed.mjs); the database built alongside ships with it.
  */
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { snapshotFile } from '../server/lib/precomputed.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
-const OUT = path.join(ROOT, 'dist', 'snapshot');
+const outArg = process.argv.indexOf('--out');
+const OUT = path.resolve(ROOT, outArg > 0 ? process.argv[outArg + 1] : 'dist/snapshot');
 const PORT = +(process.env.SNAPSHOT_PORT || 8799);
 const BASE = `http://127.0.0.1:${PORT}/api`;
 
-/** Keep in sync with snapshotFile() in src/lib/api.js */
-const snapshotFile = (p) => `${p.replace(/^\//, '').replace(/[/?&=]/g, '_')}.json`;
 const log = (...a) => console.log('[snapshot]', ...a);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -29,7 +32,7 @@ fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
 
 log(`starting API server on :${PORT} (first run seeds the database, ~1 min)…`);
-const server = spawn(process.execPath, ['--no-warnings', 'server/index.mjs'], { cwd: ROOT, env: { ...process.env, PORT: String(PORT) }, stdio: ['ignore', 'pipe', 'pipe'] });
+const server = spawn(process.execPath, ['--no-warnings', 'server/index.mjs'], { cwd: ROOT, env: { ...process.env, PORT: String(PORT), PRECOMPUTED: '0', KEEPALIVE: '0', POOL_SIZE: process.env.BUILD_POOL_SIZE || '3' }, stdio: ['ignore', 'pipe', 'pipe'] });
 // The server rolls the operating record forward and warms its caches right after it starts;
 // export only once that has finished, so every file comes from the same, current data.
 let resolveWarm;
@@ -96,7 +99,7 @@ try {
   await pool(holeIds.map((h) => `/boreholes/${h}`), 6, save);
 
   fs.writeFileSync(path.join(OUT, '_meta.json'), JSON.stringify({ built_at: new Date().toISOString(), as_of: meta.as_of, files, mines }));
-  log(`wrote ${files} files (${(bytes / 1e6).toFixed(1)} MB) to dist/snapshot/ · ${holeIds.length} drill-hole logs`);
+  log(`wrote ${files} files (${(bytes / 1e6).toFixed(1)} MB) to ${path.relative(ROOT, OUT)}/ · ${holeIds.length} drill-hole logs`);
   stop();
   process.exit(0);
 } catch (e) {

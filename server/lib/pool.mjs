@@ -7,7 +7,7 @@ import path from 'node:path';
 const WORKER = path.join(import.meta.dirname, '..', 'workers', 'forecast-worker.mjs');
 
 export class Pool {
-  constructor(size = Math.max(2, Math.min(6, os.cpus().length - 1))) {
+  constructor(size = +process.env.POOL_SIZE || Math.max(2, Math.min(6, os.cpus().length - 1))) {
     this.size = size; this.workers = []; this.queue = []; this.nextId = 1; this.pending = new Map();
     for (let i = 0; i < size; i++) this.#spawn();
   }

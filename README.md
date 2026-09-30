@@ -39,6 +39,24 @@ npm run verify:model            # prospectivity model: browser runtime == XGBoos
 
 The snapshot includes every page and every mine: forecasts, SHAP drivers, risk, alerts, action plans, reserves, the 3D block model and drill logs. Satellite Prospecting still calls the public satellite APIs live from the browser. The parts that need a running server are disabled and labelled: the what-if simulator, re-simulation, retraining and CSV import. Run those with `npm run dev`.
 
+## Deploy (Render, full backend + frontend)
+
+`render.yaml` deploys the whole platform as one Render web service: the Express API, the SQLite database and the dashboard.
+
+1. Render dashboard → **New → Blueprint** → connect this GitHub repository → **Apply**. The build takes about 5 min. The app is then at `https://moil-mine-intelligence.onrender.com` (or whatever name Render assigns).
+2. **Keep it awake.** Free instances sleep after 15 min without traffic, and the first visit then takes about 1 min.
+   - The server pings its own public URL (`RENDER_EXTERNAL_URL`) every 10 min, so it does not go idle.
+   - As a backup, `.github/workflows/keep-alive.yml` pings it every 10 min from GitHub. Add the repository variable `RENDER_URL` (Settings → Secrets and variables → Actions → **Variables**) with the service URL.
+   - One always-on service uses about 744 of the 750 free instance hours per month, so don't run other free services in the same Render workspace.
+3. **Daily refresh (optional).** Go to Render → Service → Settings → **Deploy Hook**, copy the URL, and add it as the GitHub secret `RENDER_DEPLOY_HOOK_URL`. `.github/workflows/refresh-snapshot.yml` then rebuilds the service every day at 06:00 IST.
+
+How it runs on a small instance: the build machine (2 CPU / 8 GB) seeds the database and precomputes the Monte-Carlo forecasts, risk, alerts, reserves and action plans (`npm run build:render`). With `PRECOMPUTED=1`, the server answers those requests instantly from the results. Everything else runs live on the server:
+- the what-if simulator and plan re-simulation
+- model retraining and CSV import (an import switches to live computation)
+- the live weather feed, source health checks and the model registry
+
+The free plan has 0.1 CPU, so a what-if run takes about 20–40 s. On `plan: starter` it takes a few seconds and the service never sleeps.
+
 ## Architecture
 
 ```

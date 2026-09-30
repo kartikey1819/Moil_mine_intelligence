@@ -16,6 +16,7 @@ import { sourceHealth } from './services/sources.mjs';
 import { loadProductionModel, resetModelCache } from './ml/production-model.mjs';
 import { getPool } from './lib/pool.mjs';
 import { toLatLng } from './services/terrain.mjs';
+import { precomputedJson, invalidatePrecomputed } from './lib/precomputed.mjs';
 
 export const api = express.Router();
 const wrap = (fn) => (req, res) => Promise.resolve(fn(req, res)).then((v) => { if (!res.headersSent) res.json(v); }).catch((e) => {
@@ -144,7 +145,7 @@ api.post('/mines/:id/simulate', express.json(), wrap(async (req) => {
   if (b.criticalSpares) scenario.mttrMultCritical = 0.55;
   if (b.extraUnits?.length) scenario.extraUnits = b.extraUnits.filter((x) => EQUIPMENT_CLASSES[x.cls] && x.count > 0).map((x) => ({ cls: x.cls, count: Math.min(6, +x.count), fromDay: +(x.fromDay ?? 5) }));
   if (b.actions?.length) {        // apply a subset of optimiser actions
-    const plan = await actionPlan(req.params.id);
+    const plan = precomputedJson(`/mines/${req.params.id}/actions`) || await actionPlan(req.params.id);
     for (const a of plan.actions.filter((x) => b.actions.includes(x.id))) {
       for (const [k, v] of Object.entries(a.scenario)) {
         if (k === 'pmNow') scenario.pmNow = [...new Set([...(scenario.pmNow || []), ...v])];
@@ -244,5 +245,6 @@ api.post('/import/production', express.text({ type: '*/*', limit: '20mb' }), wra
   }
   insertMany('imports', [{ at: new Date().toISOString(), kind: 'production', filename: req.get('x-filename') || 'upload.csv', rows: updated, detail: JSON.stringify({ skipped, errors }) }]);
   clearForecastCache();
+  if (updated) invalidatePrecomputed();   // the operating record changed: compute from now on
   return { updated, skipped, errors, next: 'POST /api/models/production/retrain to retrain the model on the imported data' };
 }));

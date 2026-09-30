@@ -1,0 +1,26 @@
+# Render Blueprint — full platform (Express API + SQLite + dashboard) as one web service.
+# Deploy: Render dashboard → New → Blueprint → select this repository → Apply.
+#
+# The build (2 CPU / 8 GB build machine) seeds the database and precomputes the Monte-Carlo forecasts,
+# risk and action plans; the running service answers from them instantly and computes everything else live
+# (what-if simulator, retraining, CSV import, live weather, source health). See server/lib/precomputed.mjs.
+services:
+  - type: web
+    name: moil-mine-intelligence
+    runtime: node
+    plan: free                 # "starter" (0.5 CPU, never sleeps) makes the what-if simulator ~5x faster
+    region: singapore          # closest Render region to India
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci --include=dev && npm run build:render
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: PRECOMPUTED       # serve the build-time forecasts / plans
+        value: "1"
+      - key: POOL_SIZE         # one simulation worker fits the 512 MB instance
+        value: "1"
+      - key: WHATIF_SIMS       # Monte-Carlo paths per what-if run (150 locally); fewer keeps it quick on a small CPU
+        value: "80"

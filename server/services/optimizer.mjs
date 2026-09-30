@@ -195,7 +195,7 @@ async function computePlan(mineId, live, sims, horizonWeeks) {
 }
 
 /** Custom what-if from the scenario simulator (user-set levers) vs baseline. */
-export async function simulateScenario(mineId, scenario, { sims = 150, horizonWeeks = 13 } = {}) {
+export async function simulateScenario(mineId, scenario, { sims = +process.env.WHATIF_SIMS || 150, horizonWeeks = 13 } = {}) {
   const live = await liveForecast();
   const [base, alt] = await runInPool({ task: 'scenarios', mineId, scenarios: [{ key: 'baseline', scenario: {} }, { key: 'scenario', scenario }], opts: { sims, horizonWeeks } }, live);
   return { mine_id: mineId, baseline: base, scenario: alt, delta_t_13w: round(alt.next13.mean - base.next13.mean), delta_t_4w: round(alt.next4.mean - base.next4.mean) };

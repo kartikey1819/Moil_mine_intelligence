@@ -1,8 +1,8 @@
-# Rebuilds the static Vercel snapshot every day, so the live weather forecast, alerts,
-# production forecasts and action plans stay current.
-# Setup (once): Vercel → Project → Settings → Git → Deploy Hooks → create a hook for "main",
-# then add its URL as the GitHub repository secret VERCEL_DEPLOY_HOOK_URL.
-name: Refresh Vercel snapshot
+# Rebuilds the deployments every day, so the weather, alerts, production forecasts and action plans stay current.
+# Setup (once), for whichever deployments you use:
+#   Vercel → Project → Settings → Git → Deploy Hooks → hook for "main" → GitHub secret VERCEL_DEPLOY_HOOK_URL
+#   Render → Service → Settings → Deploy Hook → copy URL                → GitHub secret RENDER_DEPLOY_HOOK_URL
+name: Refresh deployments
 
 on:
   schedule:
@@ -18,4 +18,10 @@ jobs:
           HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
         run: |
           if [ -z "$HOOK" ]; then echo "VERCEL_DEPLOY_HOOK_URL secret not set — skipping"; exit 0; fi
+          curl -fsS -X POST "$HOOK"
+      - name: Trigger Render deploy hook
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "RENDER_DEPLOY_HOOK_URL secret not set — skipping"; exit 0; fi
           curl -fsS -X POST "$HOOK"
